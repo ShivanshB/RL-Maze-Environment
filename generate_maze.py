@@ -1,10 +1,12 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import os
 import imageio
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import colors as mcolors
+
 
 class MazeGenerator:
-    def __init__(self, maze_height, maze_width, animation=False):        
+    def __init__(self, maze_height, maze_width, animation=False, endpoints=True):        
         # initialize action space
         self.action_space = np.array([[0, 1],
                              [0, -1],
@@ -14,8 +16,14 @@ class MazeGenerator:
         # create GIF or not
         self.animation = animation
 
+        # set endpoint color flag
+        self.endpoints = endpoints
+
         # save width and height attributes        
         self.width, self.height = maze_width, maze_height
+
+        # set endpoint position
+        self.finish = self.get_finish()
 
         # default starting position in top left corner
         self.start_position = np.array([0,0])
@@ -35,6 +43,10 @@ class MazeGenerator:
                 if tuple(next_position) not in self.visited:
                     # set the square in between to be empty
                     self.maze[tuple(next_position - step)] = 0
+
+                    # if endpoints, set ending position to red
+                    if self.endpoints and all(self.finish == next_position):
+                        self.maze[tuple(next_position)] = 2
 
                     # add next position to visited
                     self.visited.add(tuple(next_position))
@@ -60,6 +72,10 @@ class MazeGenerator:
         # save visited locations for DFS
         self.visited = set(tuple(self.start_position))
 
+        # if endpoints, set initial value to green
+        if self.endpoints:
+            self.maze[0, 0] = 3
+
         # run dfs from position
         self.dfs(position)
     
@@ -78,8 +94,13 @@ class MazeGenerator:
         # filename for frame
         filename = f'frame_{len(self.frames)}.png'
 
+        # setting color bounds
+        bounds = [0, 1, 2, 3, 4]
+        cmap = mcolors.ListedColormap(['white', 'black', 'red', 'green'])
+        norm = mcolors.BoundaryNorm(bounds, cmap.N)
+
         # plotting settings
-        plt.imshow(array, cmap='inferno_r')
+        plt.imshow(array, cmap=cmap, norm=norm)
         plt.axis('off')
 
         # save and close image
@@ -94,9 +115,7 @@ class MazeGenerator:
         images = []
         for filename in self.frames:
             images.append(imageio.imread(filename))
-
-        print(self.intermediates[-1])
-
+            
         # save into gif
         imageio.mimsave('maze_generation.gif', images, duration=duration)
         
@@ -106,6 +125,19 @@ class MazeGenerator:
 
         # clear the frames list
         self.frames = []
+
+    def get_finish(self):
+        # cleaner notation
+        r, c = self.height, self.width
+
+        if r % 2 == 1 and c % 2 == 1:
+            return np.array([r - 1, c - 1])
+        elif r % 2 == 0 and c % 2 == 0:
+            return np.array([r - 2, c - 2])
+        elif r % 2 == 1 and c % 2 == 0:
+            return np.array([r - 1, c - 2])
+        else:
+            return np.array([r - 2, c - 1])
     
 
         
