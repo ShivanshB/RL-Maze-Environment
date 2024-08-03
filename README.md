@@ -1,4 +1,7 @@
 # Maze Environment for RL Agents
+
+<div align="center">
+
 A simple pythonic maze generator to test RL agents. Mazes can be generated and animated as follows.
 
 ```
@@ -13,3 +16,4 @@ Colored endpoints and custom color maps can be added as well.
 
 ![maze_generation](https://github.com/user-attachments/assets/ecf896a8-802a-4132-b917-f9af9c9d2a1a)
 
+</div>
