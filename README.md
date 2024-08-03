@@ -1,12 +1,11 @@
 # Maze Environment for RL Agents
-
-<div align="center">
-
 A simple pythonic maze generator to test RL agents. Mazes can be generated and animated as follows.
 
 ```
 maze_generator = MazeGenerator(100, 100, animation=True)
 ```
+
+<div align="center">
 
 The animation of the above command is shown below.
 
