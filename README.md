@@ -1,5 +1,5 @@
 # Maze Environment for RL Agents
-A simple pythonic maze generator to test RL agents. Mazes can be generated and animated as follows.
+A simple pythonic maze generator to test RL agents. Integrates with OpenAI's gym environment interface. Mazes can be generated and animated as follows.
 
 ```
 maze_generator = MazeGenerator(100, 100, animation=True)
