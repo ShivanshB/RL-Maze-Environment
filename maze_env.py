@@ -8,7 +8,7 @@ from matplotlib import colors as mcolors
 
 
 class MazeEnv(gym.Env):
-    def __init__(self, maze_height, maze_width, animation=False, endpoints=True):        
+    def __init__(self, maze_height, maze_width, animation=False, endpoints=True, max_frames=3000):        
         # initialize directions
         self.directions = np.array([[0, 1],
                              [0, -1],
@@ -22,6 +22,9 @@ class MazeEnv(gym.Env):
         
         # create animated GIFs or not
         self.animation = animation
+
+        # set max_frames
+        self.max_frames = max_frames
 
         # initialize animation storage
         self.intermediates = {'generation': [],
@@ -63,7 +66,7 @@ class MazeEnv(gym.Env):
         self.maze[tuple(self.start_position)] = 4
 
         # reset animations per episode
-        self.intermediates['training'] = []
+        self.intermediates['training'] = [np.array(self.maze)]
         
         observation = tuple(self.agent_position)
         info = {}
@@ -82,6 +85,10 @@ class MazeEnv(gym.Env):
         if self.is_valid_position(new_position):
             # clear previous position     
             self.maze[tuple(self.agent_position)] = 0 
+
+            # set start and end squares
+            self.maze[tuple(self.start_position)] = 3
+            self.maze[tuple(self.finish)] = 2
 
             # move agent to new position 
             self.agent_position = new_position
@@ -166,7 +173,10 @@ class MazeEnv(gym.Env):
             raise RuntimeError("Animation is not enabled.")
         
         # save all frames as images
-        for frame in self.intermediates[mode]:
+        for i, frame in enumerate(self.intermediates[mode]):
+            # break and save if animation too long
+            if i > self.max_frames:
+                break
             self.save_frame(frame)
 
         # make and save gif
